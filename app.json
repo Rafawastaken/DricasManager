@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "name": "DricasManager2",
+    "slug": "DricasManager2",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c2fb4bdf-e015-4504-8bf3-46302b21f66a"
+      }
+    },
+    "android": {
+      "package": "com.rafawastaken.DricasManager2"
+    }
+  }
+}
