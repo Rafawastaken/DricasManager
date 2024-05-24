@@ -1,39 +1,57 @@
-// react
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
   SafeAreaView,
   TextInput,
-  TouchableOpacity,
-  Image,
   ActivityIndicator,
-  ActivityIndicatorComponent,
+  Image,
+  TouchableOpacity,
+  FlatList,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { Stack, useRouter } from "expo-router";
-import { useState, useEffect } from "react";
 
-// Firebase
-import { uploadDatabase, uploadMedia } from "../../hooks/firebaseHooks";
+// Firebase hooks
+import { fetchAll, getImageUrl } from "../../hooks/firebaseHooks";
 
 // Components
 import ScreenHeaderBtn from "../../components/ScreenHeaderBtn/ScreenHeaderBtn";
 import FlashMessages from "../../components/FlashMessages/FlashMessages";
+import CustomPicker from "../../components/CustomPicker/CustomPicker";
 
 // Styles
-import { COLORS, SIZES } from "../../constants/theme";
+import { COLORS } from "../../constants/theme";
 import left from "../../assets/icons/left.png";
-import style from "./adicionar.styles";
-import styles from "../pedras/adicionar.styles";
+import styles from "./adicionar.styles";
 
 const AdicionarArtigo = () => {
   const router = useRouter();
-
-  // States
   const [loading, setLoading] = useState(false);
   const [mensagem, setMensagem] = useState({ message: "", category: "" });
   const [nome, setNome] = useState("");
-  const [materiasUsados, setMateriaisUsados] = useState([]);
+  const [pedras, setPedras] = useState([]);
+  const [selectedPedras, setSelectedPedras] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+    const unsubscribePedras = fetchAll("pedras", async (data) => {
+      const pedrasWithImages = await Promise.all(
+        data.map(async (pedra) => ({
+          ...pedra,
+          imageUrl: await getImageUrl(pedra.nomeImagemEncoded),
+        }))
+      );
+      setPedras(pedrasWithImages);
+      setLoading(false);
+    });
+    return () => unsubscribePedras();
+  }, []);
+
+  const handleRemovePedra = (id) => {
+    setSelectedPedras((prevSelectedPedras) =>
+      prevSelectedPedras.filter((pedra) => pedra.id !== id)
+    );
+  };
 
   return (
     <SafeAreaView
@@ -58,13 +76,12 @@ const AdicionarArtigo = () => {
 
       {loading ? (
         <ActivityIndicator
-          size={"large"}
+          size="large"
           color={COLORS.blue}
           style={{ marginTop: 30 }}
         />
       ) : (
         <>
-          {/*Flash Messages*/}
           {mensagem.message && (
             <FlashMessages
               message={mensagem.message}
@@ -72,14 +89,11 @@ const AdicionarArtigo = () => {
             />
           )}
 
-          {/* Meta Data */}
-
-          {/* Nome */}
-          <View style={style.textContainer}>
-            <Text style={style.inputLabel}>Nome</Text>
-            <View style={style.textWrapper}>
+          <View style={styles.textContainer}>
+            <Text style={styles.inputLabel}>Nome</Text>
+            <View style={styles.textWrapper}>
               <TextInput
-                style={style.textInput}
+                style={styles.textInput}
                 placeholder="Nome Artigo"
                 value={nome}
                 onChangeText={(text) => setNome(text)}
@@ -87,7 +101,28 @@ const AdicionarArtigo = () => {
             </View>
           </View>
 
-          {/* Materiais Usados */}
+          <View style={styles.textContainer}>
+            <Text style={styles.inputLabel}>Pedra</Text>
+            <View style={styles.selectWrapper}>
+              <CustomPicker
+                items={pedras}
+                selectedValues={selectedPedras}
+                onValueChange={setSelectedPedras}
+                placeholder="Selecionar Pedra"
+              />
+            </View>
+          </View>
+
+          {selectedPedras.length > 0
+            ? selectedPedras.map((pedra) => (
+                <View key={pedra.id}>
+                  <Text>{pedra.nome}</Text>
+                  <TouchableOpacity onPress={() => handleRemovePedra(pedra.id)}>
+                    <Text>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            : null}
         </>
       )}
     </SafeAreaView>

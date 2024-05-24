@@ -15,17 +15,16 @@ import styles from "./DefaultListCard.style";
 const DefaultListCard = ({ item, handleNavigate, handleDelete }) => {
   const [imageUri, setImageUri] = useState(null);
 
-
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const url = await getImageUrl(item.nomeImagemEncoded); // Use getImageUrl function to fetch image URL
+        const url = await getImageUrl(item.nomeImagemEncoded);
         setImageUri(url);
       } catch (error) {
         console.error("Error fetching image URL:", error);
       }
     };
-     fetchImage();
+    fetchImage();
   }, [item.nomeImagemEncoded]);
 
   return (
