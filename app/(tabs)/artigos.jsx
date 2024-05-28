@@ -55,7 +55,10 @@ const ListaMateriais = () => {
               style={{ marginTop: 30 }}
             />
           ) : (
-            <ArtigosList />
+            <View>
+              <Text>Upcoming</Text>
+            </View>
+            // <ArtigosList />
           )}
         </ScrollView>
       </View>

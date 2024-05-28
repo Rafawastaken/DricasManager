@@ -20,19 +20,8 @@ const CustomPicker = ({
 
   const handleSelect = (index) => {
     const selectedItem = items[index];
-    const isAlreadySelected = selectedValues.some(
-      (item) => item.id === selectedItem.id
-    );
-
-    let newSelectedValues;
-    if (isAlreadySelected) {
-      newSelectedValues = selectedValues.filter(
-        (item) => item.id !== selectedItem.id
-      );
-    } else {
-      newSelectedValues = [...selectedValues, selectedItem];
-    }
-
+    // Append the selected item to the list
+    const newSelectedValues = [...selectedValues, selectedItem];
     onValueChange(newSelectedValues);
   };
 

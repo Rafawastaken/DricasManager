@@ -5,8 +5,6 @@ import {
   SafeAreaView,
   TextInput,
   ActivityIndicator,
-  Image,
-  TouchableOpacity,
   FlatList,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
@@ -18,9 +16,10 @@ import { fetchAll, getImageUrl } from "../../hooks/firebaseHooks";
 import ScreenHeaderBtn from "../../components/ScreenHeaderBtn/ScreenHeaderBtn";
 import FlashMessages from "../../components/FlashMessages/FlashMessages";
 import CustomPicker from "../../components/CustomPicker/CustomPicker";
+import SelectList from "../../components/SelectList/SelectList";
 
 // Styles
-import { COLORS } from "../../constants/theme";
+import { COLORS, SIZES } from "../../constants/theme";
 import left from "../../assets/icons/left.png";
 import styles from "./adicionar.styles";
 
@@ -31,25 +30,52 @@ const AdicionarArtigo = () => {
   const [nome, setNome] = useState("");
   const [pedras, setPedras] = useState([]);
   const [selectedPedras, setSelectedPedras] = useState([]);
+  const [materiais, setMateriais] = useState([]);
+  const [selectedMateriais, setSelectedMateriais] = useState([]);
 
   useEffect(() => {
     setLoading(true);
-    const unsubscribePedras = fetchAll("pedras", async (data) => {
-      const pedrasWithImages = await Promise.all(
-        data.map(async (pedra) => ({
-          ...pedra,
-          imageUrl: await getImageUrl(pedra.nomeImagemEncoded),
-        }))
-      );
-      setPedras(pedrasWithImages);
+    const fetchData = async () => {
+      const unsubscribePedras = fetchAll("pedras", async (data) => {
+        const pedrasWithImages = await Promise.all(
+          data.map(async (pedra) => ({
+            ...pedra,
+            imageUrl: await getImageUrl(pedra.nomeImagemEncoded),
+          }))
+        );
+        setPedras(pedrasWithImages);
+      });
+
+      const unsubscribeMateriais = fetchAll("materiais", async (data) => {
+        const materiaisWithImages = await Promise.all(
+          data.map(async (material) => ({
+            ...material,
+            imageUrl: await getImageUrl(material.nomeImagemEncoded),
+          }))
+        );
+        setMateriais(materiaisWithImages);
+      });
+
       setLoading(false);
-    });
-    return () => unsubscribePedras();
+
+      return () => {
+        unsubscribePedras();
+        unsubscribeMateriais();
+      };
+    };
+
+    fetchData();
   }, []);
 
   const handleRemovePedra = (id) => {
     setSelectedPedras((prevSelectedPedras) =>
       prevSelectedPedras.filter((pedra) => pedra.id !== id)
+    );
+  };
+
+  const handleRemoveMaterial = (id) => {
+    setSelectedMateriais((prevSelectedMaterial) =>
+      prevSelectedMaterial.filter((pedra) => pedra.id !== id)
     );
   };
 
@@ -89,6 +115,7 @@ const AdicionarArtigo = () => {
             />
           )}
 
+          {/* Nome do Artigo */}
           <View style={styles.textContainer}>
             <Text style={styles.inputLabel}>Nome</Text>
             <View style={styles.textWrapper}>
@@ -101,6 +128,7 @@ const AdicionarArtigo = () => {
             </View>
           </View>
 
+          {/* Selecionar Pedras */}
           <View style={styles.textContainer}>
             <Text style={styles.inputLabel}>Pedra</Text>
             <View style={styles.selectWrapper}>
@@ -113,16 +141,62 @@ const AdicionarArtigo = () => {
             </View>
           </View>
 
-          {selectedPedras.length > 0
-            ? selectedPedras.map((pedra) => (
-                <View key={pedra.id}>
-                  <Text>{pedra.nome}</Text>
-                  <TouchableOpacity onPress={() => handleRemovePedra(pedra.id)}>
-                    <Text>Close</Text>
-                  </TouchableOpacity>
-                </View>
-              ))
-            : null}
+          {/* Selecionar Materiais */}
+          <View style={styles.textContainer}>
+            <Text style={styles.inputLabel}>Materiais</Text>
+            <View style={styles.selectWrapper}>
+              <CustomPicker
+                items={materiais}
+                selectedValues={selectedMateriais}
+                onValueChange={setSelectedMateriais}
+                placeholder="Selecionar Material"
+              />
+            </View>
+          </View>
+
+          {/* Listas */}
+          <View>
+            {/* Lista Pedras */}
+            {selectedPedras.length > 0 && (
+              <>
+                <Text style={styles.textHeaderSelected}>
+                  Pedras Selecionadas
+                </Text>
+                <FlatList
+                  data={selectedPedras}
+                  renderItem={({ item }) => (
+                    <SelectList
+                      image={item.imageUrl}
+                      name={item.nome}
+                      preco={item.precoCusto}
+                      handleRemove={() => handleRemovePedra(item.id)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id.toString()}
+                />
+              </>
+            )}
+            {/* Lista Materiais */}
+            {selectedMateriais.length > 0 && (
+              <>
+                <Text style={styles.textHeaderSelected}>
+                  Materiais Selecionados
+                </Text>
+                <FlatList
+                  data={selectedMateriais}
+                  renderItem={({ item }) => (
+                    <SelectList
+                      image={item.imageUrl}
+                      name={item.nome}
+                      preco={item.precoCusto}
+                      handleRemove={() => handleRemoveMaterial(item.id)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id.toString()}
+                />
+              </>
+            )}
+          </View>
         </>
       )}
     </SafeAreaView>
@@ -130,3 +204,7 @@ const AdicionarArtigo = () => {
 };
 
 export default AdicionarArtigo;
+
+// -----------------------------------------------
+// | Preco | _____________ | [valor material]    |
+// -----------------------------------------------

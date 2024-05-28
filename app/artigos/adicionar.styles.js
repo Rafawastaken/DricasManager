@@ -130,6 +130,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  textHeaderSelected: {
+    color: COLORS.blue,
+    fontSize: SIZES.medium,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
 });
 
 export default styles;
