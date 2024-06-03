@@ -85,6 +85,20 @@ const getImageUrl = async (nomeImagemEncoded) => {
 
 // Fetch All
 const fetchAll = (tableName, callback) => {
+  if (tableName === "materiais") {
+    return onSnapshot(collection(db, tableName), (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        nome: doc.data().nome,
+        nomeImagemEncoded: doc.data().nomeImagemEncoded,
+        quantidade: doc.data().quantidade,
+        precoCusto: doc.data().precoCusto,
+        calculoPreco: Number(doc.data().calculoPreco), // Convert calculoPreco to a number
+      }));
+      callback(data);
+    });
+  }
+
   return onSnapshot(collection(db, tableName), (snapshot) => {
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,

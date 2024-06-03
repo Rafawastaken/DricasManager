@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { LogBox } from "react-native";
 import {
   Text,
   View,
@@ -6,6 +7,9 @@ import {
   TextInput,
   ActivityIndicator,
   FlatList,
+  TouchableOpacity,
+  Image,
+  ScrollView,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 
@@ -23,7 +27,14 @@ import { COLORS, SIZES } from "../../constants/theme";
 import left from "../../assets/icons/left.png";
 import styles from "./adicionar.styles";
 
+// Helpers
+import pickImage from "../../utils/pickImage";
+
 const AdicionarArtigo = () => {
+  // These are bugs from react native
+  LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+  LogBox.ignoreLogs(["initialScrollIndex"]);
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [mensagem, setMensagem] = useState({ message: "", category: "" });
@@ -32,6 +43,13 @@ const AdicionarArtigo = () => {
   const [selectedPedras, setSelectedPedras] = useState([]);
   const [materiais, setMateriais] = useState([]);
   const [selectedMateriais, setSelectedMateriais] = useState([]);
+  const [image, setImage] = useState(null);
+  const [quantidadeMaterial, setQuantidadeMaterial] = useState(1);
+  const [totalCost, setTotalCost] = useState(0);
+
+  const uploadData = () => {
+    setLoading(true);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -67,6 +85,27 @@ const AdicionarArtigo = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const calcularValorGastos = () => {
+      let valorPedras = 0;
+      let valorMateriais = 0;
+
+      selectedPedras.forEach((pedra) => {
+        valorPedras += Number(pedra.precoCusto) || 0; // Ensure precoCusto is a number
+      });
+
+      selectedMateriais.forEach((material) => {
+        console.log(material);
+        valorMateriais +=
+          Number(material.calculoPreco) * Number(quantidadeMaterial) || 0; // Multiply calculoPreco by quantidadeMaterial
+      });
+
+      setTotalCost(valorPedras + valorMateriais);
+    };
+
+    calcularValorGastos();
+  }, [selectedPedras, selectedMateriais, quantidadeMaterial]);
+
   const handleRemovePedra = (id) => {
     setSelectedPedras((prevSelectedPedras) =>
       prevSelectedPedras.filter((pedra) => pedra.id !== id)
@@ -75,90 +114,87 @@ const AdicionarArtigo = () => {
 
   const handleRemoveMaterial = (id) => {
     setSelectedMateriais((prevSelectedMaterial) =>
-      prevSelectedMaterial.filter((pedra) => pedra.id !== id)
+      prevSelectedMaterial.filter((material) => material.id !== id)
     );
   };
 
   return (
     <SafeAreaView
-      style={{ flex: 1, padding: 10, backgroundColor: COLORS.pureWhite }}
+      style={{
+        flex: 1,
+        backgroundColor: COLORS.pureWhite,
+        width: "100%",
+      }}
     >
-      <Stack.Screen
-        options={{
-          headerStyle: { backgroundColor: COLORS.pureWhite },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <ScreenHeaderBtn
-              iconUrl={left}
-              dimension="60%"
-              handlePress={() => router.back()}
-            />
-          ),
-          headerTitle: "Adicionar Artigo",
-          headerTitleAlign: "center",
-          headerTitleStyle: { color: COLORS.blue, fontWeight: "bold" },
-        }}
-      />
-
-      {loading ? (
-        <ActivityIndicator
-          size="large"
-          color={COLORS.blue}
-          style={{ marginTop: 30 }}
+      <ScrollView>
+        <Stack.Screen
+          options={{
+            headerStyle: { backgroundColor: COLORS.pureWhite },
+            headerShadowVisible: false,
+            headerLeft: () => (
+              <ScreenHeaderBtn
+                iconUrl={left}
+                dimension="60%"
+                handlePress={() => router.back()}
+              />
+            ),
+            headerTitle: "Adicionar Artigo",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: COLORS.blue, fontWeight: "bold" },
+          }}
         />
-      ) : (
-        <>
-          {mensagem.message && (
-            <FlashMessages
-              message={mensagem.message}
-              category={mensagem.category}
-            />
-          )}
-
-          {/* Nome do Artigo */}
-          <View style={styles.textContainer}>
-            <Text style={styles.inputLabel}>Nome</Text>
-            <View style={styles.textWrapper}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Nome Artigo"
-                value={nome}
-                onChangeText={(text) => setNome(text)}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color={COLORS.blue}
+            style={{ marginTop: 30 }}
+          />
+        ) : (
+          <>
+            {mensagem.message && (
+              <FlashMessages
+                message={mensagem.message}
+                category={mensagem.category}
               />
-            </View>
-          </View>
+            )}
 
-          {/* Selecionar Pedras */}
-          <View style={styles.textContainer}>
-            <Text style={styles.inputLabel}>Pedra</Text>
-            <View style={styles.selectWrapper}>
-              <CustomPicker
-                items={pedras}
-                selectedValues={selectedPedras}
-                onValueChange={setSelectedPedras}
-                placeholder="Selecionar Pedra"
-              />
+            {/* Nome do Artigo */}
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                height: 40,
+                marginBottom: 10,
+              }}
+            >
+              <Text style={styles.inputLabel}>Nome</Text>
+              <View style={styles.textWrapper}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Nome Artigo"
+                  value={nome}
+                  onChangeText={(text) => setNome(text)}
+                />
+              </View>
             </View>
-          </View>
 
-          {/* Selecionar Materiais */}
-          <View style={styles.textContainer}>
-            <Text style={styles.inputLabel}>Materiais</Text>
-            <View style={styles.selectWrapper}>
-              <CustomPicker
-                items={materiais}
-                selectedValues={selectedMateriais}
-                onValueChange={setSelectedMateriais}
-                placeholder="Selecionar Material"
-              />
+            {/* Selecionar Pedras */}
+            <View style={styles.textContainer}>
+              <Text style={styles.inputLabel}>Pedra</Text>
+              <View style={styles.selectWrapper}>
+                <CustomPicker
+                  items={pedras}
+                  selectedValues={selectedPedras}
+                  onValueChange={setSelectedPedras}
+                  placeholder="Selecionar Pedra"
+                />
+              </View>
             </View>
-          </View>
 
-          {/* Listas */}
-          <View>
             {/* Lista Pedras */}
             {selectedPedras.length > 0 && (
-              <>
+              <View style={{ marginBottom: 20 }}>
                 <Text style={styles.textHeaderSelected}>
                   Pedras Selecionadas
                 </Text>
@@ -174,11 +210,25 @@ const AdicionarArtigo = () => {
                   )}
                   keyExtractor={(item) => item.id.toString()}
                 />
-              </>
+              </View>
             )}
+
+            {/* Selecionar Materiais */}
+            <View style={styles.textContainer}>
+              <Text style={styles.inputLabel}>Materiais</Text>
+              <View style={styles.selectWrapper}>
+                <CustomPicker
+                  items={materiais}
+                  selectedValues={selectedMateriais}
+                  onValueChange={setSelectedMateriais}
+                  placeholder="Selecionar Material"
+                />
+              </View>
+            </View>
+
             {/* Lista Materiais */}
             {selectedMateriais.length > 0 && (
-              <>
+              <View style={{ marginBottom: 20 }}>
                 <Text style={styles.textHeaderSelected}>
                   Materiais Selecionados
                 </Text>
@@ -194,17 +244,109 @@ const AdicionarArtigo = () => {
                   )}
                   keyExtractor={(item) => item.id.toString()}
                 />
-              </>
+              </View>
             )}
-          </View>
-        </>
-      )}
+
+            {/* Quantidade Material */}
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                height: 40,
+                marginBottom: 10,
+              }}
+            >
+              <Text style={styles.inputLabel}>Qnt Material</Text>
+              <View style={styles.textWrapper}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Quantidade Material"
+                  value={quantidadeMaterial}
+                  onChangeText={(text) => setQuantidadeMaterial(text)}
+                />
+              </View>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 10,
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ fontSize: 18 }}>
+                Preço Gastos:{" "}
+                <Text style={{ fontWeight: "bold", color: COLORS.blue }}>
+                  {totalCost?.toFixed(2)}€
+                </Text>
+              </Text>
+            </View>
+
+            {/* Price */}
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                height: 40,
+                marginBottom: 10,
+              }}
+            >
+              <Text style={styles.inputLabel}>Preço</Text>
+              <View style={styles.textWrapper}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Preço Artigo"
+                  value={nome}
+                  onChangeText={(text) => setNome(text)}
+                />
+              </View>
+            </View>
+
+            {/* Upload Media */}
+            <TouchableOpacity
+              onPress={async () => {
+                const uri = await pickImage();
+                setImage(uri);
+              }}
+            >
+              {image && (
+                <Image
+                  style={{
+                    width: "auto",
+                    height: 300,
+                    borderRadius: SIZES.medium,
+                    marginLeft: 10,
+                    marginRight: 20,
+                    marginTop: 10,
+                  }}
+                  source={{ uri: image }}
+                />
+              )}
+              <Text style={styles.btnUploadImage}>Escolher Imagem</Text>
+            </TouchableOpacity>
+
+            {/* Actions */}
+            <View style={styles.formControllersContainer}>
+              <TouchableOpacity
+                style={styles.btnControllersContainer}
+                onPress={uploadData}
+              >
+                <Text style={styles.btnSubmit}>Carregar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnControllersContainer}
+                onPress={() => router.back()}
+              >
+                <Text style={styles.btnGoBack}>Voltar</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 export default AdicionarArtigo;
-
-// -----------------------------------------------
-// | Preco | _____________ | [valor material]    |
-// -----------------------------------------------

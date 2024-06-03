@@ -3,8 +3,8 @@ import { COLORS, SIZES } from "../../constants/theme";
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    // Necessario colocar fundo pureWhite
+    width: "95%",
+    backgroundColor: COLORS.pureWhite,
   },
 
   textContainer: {
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     textAlign: "center",
     height: "auto",
-    width: 150,
+    width: 130,
     padding: 10,
     marginRight: 10,
     alignSelf: "center",
@@ -64,6 +64,8 @@ const styles = StyleSheet.create({
   },
 
   btnUploadImage: {
+    width: "93%",
+    marginHorizontal: 10,
     color: COLORS.blue,
     textTransform: "uppercase",
     fontWeight: "bold",
@@ -75,16 +77,18 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.medium,
     borderColor: COLORS.blue,
     borderWidth: 1,
-    marginTop: 10,
+    marginTop: 20,
+    marginBottom: 20,
   },
 
   formControllersContainer: {
     flex: 1,
     flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
+    width: "93%",
+    justifyContent: "center",
     gap: 5,
     marginTop: 20,
+    marginHorizontal: 10,
   },
 
   btnControllersContainer: {
@@ -135,6 +139,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     fontWeight: "bold",
     marginTop: 10,
+    marginHorizontal: 20,
   },
 });
 
