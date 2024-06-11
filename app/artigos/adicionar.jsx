@@ -1,3 +1,8 @@
+// ? FIX ME
+// Modals: -1 index
+// Virutalized Lists bugged af
+// Working tho
+
 import { useState, useEffect } from "react";
 import { LogBox } from "react-native";
 import {
@@ -14,7 +19,12 @@ import {
 import { Stack, useRouter } from "expo-router";
 
 // Firebase hooks
-import { fetchAll, getImageUrl } from "../../hooks/firebaseHooks";
+import {
+  fetchAll,
+  getImageUrl,
+  uploadDatabase,
+  uploadMedia,
+} from "../../hooks/firebaseHooks";
 
 // Components
 import ScreenHeaderBtn from "../../components/ScreenHeaderBtn/ScreenHeaderBtn";
@@ -38,17 +48,63 @@ const AdicionarArtigo = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [mensagem, setMensagem] = useState({ message: "", category: "" });
+
+  // Meta Data
   const [nome, setNome] = useState("");
+  const [preco, setPreco] = useState("");
+  const [image, setImage] = useState(null);
+
+  // Pedra
   const [pedras, setPedras] = useState([]);
   const [selectedPedras, setSelectedPedras] = useState([]);
+
+  // Materiais
   const [materiais, setMateriais] = useState([]);
   const [selectedMateriais, setSelectedMateriais] = useState([]);
-  const [image, setImage] = useState(null);
   const [quantidadeMaterial, setQuantidadeMaterial] = useState(1);
+
+  // Custo
   const [totalCost, setTotalCost] = useState(0);
 
-  const uploadData = () => {
+  const uploadData = async () => {
     setLoading(true);
+    setMensagem({ message: "", category: "" }); // Reset message state
+
+    try {
+      // Upload the image
+      const nomeImagemEncoded = await uploadMedia(image);
+      if (!nomeImagemEncoded) {
+        throw new Error("Erro ao carregar imagem");
+      }
+
+      // Prepare data
+      const data = {
+        nome,
+        selectedPedras,
+        selectedMateriais,
+        preco,
+        nomeImagemEncoded,
+      };
+
+      // Upload data to Firebase
+      const uploadResult = await uploadDatabase("artigos", data);
+      if (uploadResult !== true) {
+        throw new Error("Erro ao carregar dados");
+      }
+
+      setMensagem({ message: "Upload realizado", category: "success" });
+
+      // Reset form fields
+      setNome("");
+      setPreco("");
+      setImage(null);
+      setSelectedPedras([]);
+      setSelectedMateriais([]);
+    } catch (error) {
+      setMensagem({ message: error.message, category: "danger" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -95,7 +151,6 @@ const AdicionarArtigo = () => {
       });
 
       selectedMateriais.forEach((material) => {
-        console.log(material);
         valorMateriais +=
           Number(material.calculoPreco) * Number(quantidadeMaterial) || 0; // Multiply calculoPreco by quantidadeMaterial
       });
@@ -298,8 +353,8 @@ const AdicionarArtigo = () => {
                 <TextInput
                   style={styles.textInput}
                   placeholder="Preço Artigo"
-                  value={nome}
-                  onChangeText={(text) => setNome(text)}
+                  value={preco}
+                  onChangeText={(text) => setPreco(text)}
                 />
               </View>
             </View>

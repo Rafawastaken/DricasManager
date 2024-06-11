@@ -21,7 +21,7 @@ import ScreenHeaderBtn from "../../components/ScreenHeaderBtn/ScreenHeaderBtn";
 import FlashMessages from "../../components/FlashMessages/FlashMessages";
 
 // Styles
-import {COLORS, SIZES} from "../../constants/theme";
+import { COLORS, SIZES } from "../../constants/theme";
 import styles from "./adicionar.styles";
 import left from "../../assets/icons/left.png";
 
@@ -162,7 +162,11 @@ const AdicionarPedra = () => {
           >
             {image && (
               <Image
-                style={{ width: "auto", height: 300, borderRadius:SIZES.medium }}
+                style={{
+                  width: "auto",
+                  height: 300,
+                  borderRadius: SIZES.medium,
+                }}
                 source={{ uri: image }}
               />
             )}
