@@ -1,11 +1,5 @@
 // React
-import {
-  ActivityIndicator,
-  SafeAreaView,
-  View,
-  ScrollView,
-  Text,
-} from "react-native";
+import { SafeAreaView, View, ScrollView, Text } from "react-native";
 import { useRouter, Stack } from "expo-router";
 import { useState } from "react";
 
@@ -48,18 +42,7 @@ const ListaMateriais = () => {
             actionTitle={"Adicionar"}
             action={adicionarMaterial}
           />
-          {loading ? (
-            <ActivityIndicator
-              size={"large"}
-              colors={COLORS.blue}
-              style={{ marginTop: 30 }}
-            />
-          ) : (
-            <View>
-              <Text>Upcoming</Text>
-            </View>
-            // <ArtigosList />
-          )}
+          <ArtigosList />
         </ScrollView>
       </View>
     </SafeAreaView>

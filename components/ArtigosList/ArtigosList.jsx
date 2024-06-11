@@ -1,42 +1,47 @@
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
-import { View } from "react-native";
+import { View, ActivityIndicator } from "react-native";
+
+// Firebase hooks
+import { fetchAll } from "../../hooks/firebaseHooks";
+
 import { SIZES } from "../../constants/theme";
+
 import DefaultListCard from "../DefaultListCard/DefaultListCard";
-import artigos from "./ArtigosListExample";
 
 const ArtigosList = () => {
   const navigation = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [artigos, setArtigos] = useState([]);
 
-  const calculatePrecoCusto = (artigo) => {
-    const custo_pedras = artigo.pedras.reduce(
-      (acc, pedra) => acc + pedra.preco * pedra.quantidade_usada,
-      0
-    );
-    const custo_material = artigo.material.reduce(
-      (acc, material) =>
-        acc +
-        (material.preco / material.quantidade_encomendada) *
-          material.quantidade_usada,
-      0
-    );
-    const preco_custo = custo_pedras + custo_material;
-    return preco_custo.toFixed(2);
-  };
+  useEffect(() => {
+    const unsubscribe = fetchAll("artigos", (data) => {
+      setArtigos(data);
+      setLoading(false);
+    });
+
+    // clean listener on unmount
+    return () => unsubscribe();
+  }, []);
 
   return (
     <View style={{ marginTop: SIZES.medium, gap: SIZES.small }}>
-      {artigos.map((artigo) => (
-        <DefaultListCard
-          item={{ ...artigo, preco_custo: calculatePrecoCusto(artigo) }}
-          key={artigo.id}
-          handleNavigate={() => {
-            navigation.push(`/artigo/${artigo.id}`);
-          }}
-          handleDelete={() => {
-            navigation.push(`/artigo/apagar/${artigo.id}`);
-          }}
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={COLORS.blue}
+          style={{ marginTop: 30 }}
         />
-      ))}
+      ) : (
+        artigos.map((artigo) => (
+          <DefaultListCard
+            item={artigo}
+            key={artigo.id}
+            handleNavigate={""}
+            handleDelete={""}
+          />
+        ))
+      )}
     </View>
   );
 };
