@@ -19,7 +19,7 @@ const ListCardEncomendas = ({ item, handleNavigate }) => {
     case "Em preparação":
       icon = workingIcon;
       break;
-    case "Reservado":
+    case "Aguardar Pagamento":
       icon = waitingIcon;
       break;
   }
