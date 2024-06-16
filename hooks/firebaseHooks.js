@@ -6,8 +6,16 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  deleteDoc,
 } from "@firebase/firestore";
-import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
+
+import {
+  getStorage,
+  ref,
+  getDownloadURL,
+  uploadBytes,
+  deleteObject,
+} from "firebase/storage";
 
 import * as FileSystem from "expo-file-system";
 
@@ -99,6 +107,21 @@ const fetchAll = (tableName, callback) => {
     });
   }
 
+  if (tableName === "artigos") {
+    return onSnapshot(collection(db, tableName), (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        nome: doc.data().nome,
+        nomeImagemEncoded: doc.data().nomeImagemEncoded,
+        quantidade: doc.data().quantidade,
+        precoCusto: doc.data().precoCusto,
+        preco: doc.data().preco,
+        calculoPreco: Number(doc.data().calculoPreco), // Convert calculoPreco to a number
+      }));
+      callback(data);
+    });
+  }
+
   return onSnapshot(collection(db, tableName), (snapshot) => {
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -111,4 +134,41 @@ const fetchAll = (tableName, callback) => {
   });
 };
 
-export { uploadDatabase, uploadMedia, fetchById, getImageUrl, fetchAll };
+// Delete storage entry
+const deleteMedia = async (id) => {
+  const fileRef = ref(storage, id);
+
+  try {
+    await deleteObject(fileRef);
+    console.log("Item deleted!");
+    return true;
+  } catch (error) {
+    console.error("Error deleting media:", error);
+    return false;
+  }
+};
+
+// Delete database entry
+const deleteItem = async (tableName, id, imageId) => {
+  console.log(imageId);
+
+  try {
+    const deleteMediaSuc = await deleteMedia(imageId);
+    if (deleteMediaSuc) {
+      await deleteDoc(doc(db, tableName, id));
+      console.log("Item removed from database!");
+    }
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    throw error;
+  }
+};
+
+export {
+  uploadDatabase,
+  uploadMedia,
+  fetchById,
+  getImageUrl,
+  fetchAll,
+  deleteItem,
+};

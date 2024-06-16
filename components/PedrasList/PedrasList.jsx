@@ -1,12 +1,10 @@
 // React
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 
 // Firebase
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase";
-import { fetchAll } from "../../hooks/firebaseHooks";
+import { fetchAll, deleteItem } from "../../hooks/firebaseHooks";
 
 // Styles
 import { SIZES, COLORS } from "../../constants/theme";
@@ -34,7 +32,7 @@ const PedrasList = () => {
           colors={COLORS.blue}
           style={{ marginTop: 30 }}
         />
-      ) : (
+      ) : pedras ? (
         pedras.map((pedra) => (
           <DefaultListCard
             item={pedra}
@@ -43,10 +41,14 @@ const PedrasList = () => {
               navigation.push(`/pedras/${pedra.id}`);
             }}
             handleDelete={() => {
-              navigation.push(`/pedras/apagar/${pedra.id}`);
+              deleteItem("pedras", pedra.id, pedra.nomeImagemEncoded);
             }}
           />
         ))
+      ) : (
+        <View>
+          <Text>Sem pedras adicionadas</Text>
+        </View>
       )}
     </View>
   );

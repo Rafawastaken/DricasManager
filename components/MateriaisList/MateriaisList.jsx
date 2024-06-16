@@ -1,13 +1,13 @@
 // React
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Text } from "react-native";
 
 // Styles
 import { SIZES, COLORS } from "../../constants/theme"; // Make sure COLORS is imported
 
 // Firebase hooks
-import { fetchAll } from "../../hooks/firebaseHooks";
+import { fetchAll, deleteItem } from "../../hooks/firebaseHooks";
 
 // Components
 import DefaultListCard from "../DefaultListCard/DefaultListCard";
@@ -36,7 +36,7 @@ const MateriaisList = () => {
           color={COLORS.blue}
           style={{ marginTop: 30 }}
         />
-      ) : (
+      ) : materiais ? (
         materiais.map((material) => (
           <DefaultListCard
             item={material}
@@ -45,10 +45,14 @@ const MateriaisList = () => {
               navigation.push(`/materiais/${material.id}`);
             }}
             handleDelete={() => {
-              navigation.push(`/materiais/apagar/${material.id}`);
+              deleteItem("materiais", pedra.id, pedra.nomeImagemEncoded);
             }}
           />
         ))
+      ) : (
+        <View>
+          <Text>Sem materiais adicionados</Text>
+        </View>
       )}
     </View>
   );

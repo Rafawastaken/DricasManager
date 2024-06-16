@@ -1,8 +1,3 @@
-// ? FIX ME
-// Modals: -1 index
-// Virutalized Lists bugged af
-// Working tho
-
 import { useState, useEffect } from "react";
 import { LogBox } from "react-native";
 import {
@@ -54,6 +49,9 @@ const AdicionarArtigo = () => {
   const [preco, setPreco] = useState("");
   const [image, setImage] = useState(null);
 
+  // De momento nao esta a ser usado mas poderá ser necessario:
+  const [quantidade, setQuantidade] = useState(1);
+
   // Pedra
   const [pedras, setPedras] = useState([]);
   const [selectedPedras, setSelectedPedras] = useState([]);
@@ -64,13 +62,23 @@ const AdicionarArtigo = () => {
   const [quantidadeMaterial, setQuantidadeMaterial] = useState(1);
 
   // Custo
-  const [totalCost, setTotalCost] = useState(0);
+  const [precoCusto, setPrecoCusto] = useState(0);
 
   const uploadData = async () => {
     setLoading(true);
     setMensagem({ message: "", category: "" }); // Reset message state
 
     try {
+      // Log the current state values
+      console.log("Current State:", {
+        nome,
+        preco,
+        quantidade,
+        precoCusto,
+        selectedPedras,
+        selectedMateriais,
+      });
+
       // Upload the image
       const nomeImagemEncoded = await uploadMedia(image);
       if (!nomeImagemEncoded) {
@@ -82,9 +90,14 @@ const AdicionarArtigo = () => {
         nome,
         selectedPedras,
         selectedMateriais,
-        preco,
+        preco: Number(preco), // Ensure preco is a number
         nomeImagemEncoded,
+        precoCusto: Number(precoCusto), // Ensure precoCusto is a number
+        quantidade: Number(quantidade), // Ensure quantidade is a number
       };
+
+      // Log the data to debug
+      console.log("Data to upload:", data);
 
       // Upload data to Firebase
       const uploadResult = await uploadDatabase("artigos", data);
@@ -97,6 +110,8 @@ const AdicionarArtigo = () => {
       // Reset form fields
       setNome("");
       setPreco("");
+      setQuantidade(1);
+      setPrecoCusto(0);
       setImage(null);
       setSelectedPedras([]);
       setSelectedMateriais([]);
@@ -155,7 +170,7 @@ const AdicionarArtigo = () => {
           Number(material.calculoPreco) * Number(quantidadeMaterial) || 0; // Multiply calculoPreco by quantidadeMaterial
       });
 
-      setTotalCost(valorPedras + valorMateriais);
+      setPrecoCusto(valorPedras + valorMateriais);
     };
 
     calcularValorGastos();
@@ -317,8 +332,8 @@ const AdicionarArtigo = () => {
                 <TextInput
                   style={styles.textInput}
                   placeholder="Quantidade Material"
-                  value={quantidadeMaterial}
-                  onChangeText={(text) => setQuantidadeMaterial(text)}
+                  value={quantidadeMaterial.toString()}
+                  onChangeText={(text) => setQuantidadeMaterial(Number(text))}
                 />
               </View>
             </View>
@@ -333,7 +348,7 @@ const AdicionarArtigo = () => {
               <Text style={{ fontSize: 18 }}>
                 Preço Gastos:{" "}
                 <Text style={{ fontWeight: "bold", color: COLORS.blue }}>
-                  {totalCost?.toFixed(2)}€
+                  {precoCusto.toFixed(2)}€
                 </Text>
               </Text>
             </View>
