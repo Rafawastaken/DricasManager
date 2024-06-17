@@ -7,7 +7,7 @@ import {
   Text,
 } from "react-native";
 import { useRouter, Stack } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Configs
 import { COLORS, SIZES } from "../../constants/theme";
@@ -15,8 +15,18 @@ import { COLORS, SIZES } from "../../constants/theme";
 // Components
 import EncomendasList from "../../components/EncomendasList/EncomendasList";
 
-const ListaMateriais = () => {
+// Firebase
+import { fetchAll } from "../../hooks/firebaseHooks";
+
+const ListaEncomendas = () => {
   const [loading, setLoading] = useState(false);
+  const [encomendas, setEncomendas] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = fetchAll("encomendas", setEncomendas);
+    setLoading(false);
+    return () => unsubscribe();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.pureWhite }}>
@@ -43,7 +53,7 @@ const ListaMateriais = () => {
               style={{ marginTop: 30 }}
             />
           ) : (
-            <EncomendasList />
+            <EncomendasList encomendas={encomendas} />
           )}
         </ScrollView>
       </View>
@@ -51,4 +61,4 @@ const ListaMateriais = () => {
   );
 };
 
-export default ListaMateriais;
+export default ListaEncomendas;

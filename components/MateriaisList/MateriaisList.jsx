@@ -45,7 +45,7 @@ const MateriaisList = () => {
               navigation.push(`/materiais/${material.id}`);
             }}
             handleDelete={() => {
-              deleteItem("materiais", pedra.id, pedra.nomeImagemEncoded);
+              deleteItem("materiais", material.id, material.nomeImagemEncoded);
             }}
           />
         ))

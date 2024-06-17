@@ -23,11 +23,13 @@ const styles = StyleSheet.create({
   refEncomenda: {
     backgroundColor: COLORS.blue,
     color: COLORS.white,
-    paddingHorizontal: 15, // Adjust padding to your preference
+    width: 70,
+    textAlign: "center",
+    paddingHorizontal: 5, // Adjust padding to your preference
     paddingVertical: 10, // Adjust padding to your preference
     borderRadius: 100, // Make it a circle
-    fontWeight: "bold",
-    fontSize: 16,
+    // fontWeight: "bold",
+    fontSize: 14,
   },
   textContainer: {
     flex: 1,

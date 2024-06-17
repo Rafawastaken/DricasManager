@@ -1,5 +1,5 @@
 // React
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
@@ -11,31 +11,27 @@ import ListCardEncomendas from "../ListCardEncomendas/ListCardEncomendas";
 import styles from "./EncomendasList.style";
 import { COLORS } from "../../constants/theme";
 
-const EncomendasList = () => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+// Firebase
+import { fetchAll } from "../../hooks/firebaseHooks";
 
-  const encomendas = [];
+const EncomendasList = ({ encomendas }) => {
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
       <HeaderAction
         title={"Encomendas Recentes"}
         actionTitle={"Adicionar"}
-        action={() => router.push("/")}
+        action={() => router.push("/encomendas/adicionar")}
       />
       <View style={styles.cardsContainer}>
-        {/* {loading ? (
-          <ActivityIndicator size={"large"} colors={COLORS.blue} />
-        ) : (
-          sortedEncomendas.map((encomenda) => (
-            <ListCardEncomendas
-              item={encomenda}
-              key={encomenda.id}
-              handleNavigate={() => router.push(`/encomendas/${encomenda.id}`)}
-            />
-          ))
-        )} */}
+        {encomendas.map((encomenda) => (
+          <ListCardEncomendas
+            item={encomenda}
+            key={encomenda.id}
+            handleNavigate={() => router.push(`/encomendas/${encomenda.id}`)}
+          />
+        ))}
       </View>
     </View>
   );

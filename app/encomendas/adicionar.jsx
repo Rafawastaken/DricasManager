@@ -66,6 +66,19 @@ const AdicionarEncomenda = () => {
     return `${day}-${month}-${year}`;
   };
 
+  const generateReference = () => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    let result = "";
+    for (let i = 0; i < 4; i++) {
+      result += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    for (let i = 0; i < 2; i++) {
+      result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
+    return result;
+  };
+
   // Upload to firebase
   const uploadData = async () => {
     setLoading(true);
@@ -77,7 +90,8 @@ const AdicionarEncomenda = () => {
       estado,
       artigos,
       contacto,
-      orderDate: orderDate(), // Call the function to get the date string
+      orderDate: orderDate(),
+      reference: generateReference(),
     };
 
     setNome("");

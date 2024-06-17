@@ -69,16 +69,6 @@ const AdicionarArtigo = () => {
     setMensagem({ message: "", category: "" }); // Reset message state
 
     try {
-      // Log the current state values
-      console.log("Current State:", {
-        nome,
-        preco,
-        quantidade,
-        precoCusto,
-        selectedPedras,
-        selectedMateriais,
-      });
-
       // Upload the image
       const nomeImagemEncoded = await uploadMedia(image);
       if (!nomeImagemEncoded) {
@@ -95,9 +85,6 @@ const AdicionarArtigo = () => {
         precoCusto: Number(precoCusto), // Ensure precoCusto is a number
         quantidade: Number(quantidade), // Ensure quantidade is a number
       };
-
-      // Log the data to debug
-      console.log("Data to upload:", data);
 
       // Upload data to Firebase
       const uploadResult = await uploadDatabase("artigos", data);

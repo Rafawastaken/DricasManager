@@ -222,7 +222,7 @@ const AdicionarMaterial = () => {
             <Text style={styles.btnUploadImage}>Escolher Imagem</Text>
           </TouchableOpacity>
 
-          {/*Form Submit*/}
+          {/* Form Submit */}
           <View style={styles.formControllersContainer}>
             <TouchableOpacity
               style={styles.btnControllersContainer}

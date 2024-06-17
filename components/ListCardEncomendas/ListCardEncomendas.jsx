@@ -12,28 +12,39 @@ import workingIcon from "../../assets/icons/working.png";
 const ListCardEncomendas = ({ item, handleNavigate }) => {
   let icon = "";
 
-  switch (item.estado) {
-    case "Enviado":
-      icon = completedIcon;
+  // Aguardar Pagamento
+  // Em preparação
+  // Enviado
+
+  switch (item.estado.id) {
+    case 0:
+      icon = waitingIcon;
       break;
-    case "Em preparação":
+    case 1:
       icon = workingIcon;
       break;
-    case "Aguardar Pagamento":
-      icon = waitingIcon;
+    case 2:
+      icon = completedIcon;
       break;
   }
 
   return (
     <TouchableOpacity onPress={handleNavigate} style={styles.container}>
       <TouchableOpacity onPress={handleNavigate} style={styles.refBackground}>
-        <Text style={styles.refEncomenda}>{item.id + 1}</Text>
+        <Text style={styles.refEncomenda}>{item.reference}</Text>
       </TouchableOpacity>
       <View style={styles.textContainer}>
         <Text style={styles.nome} numberOfLines={1}>
           Encomenda de <Text style={{ fontWeight: "bold" }}>{item.nome}</Text>
         </Text>
-        <Text styles={styles.data}>{item.data} </Text>
+
+        <Text styles={styles.data}>
+          {item.orderDate} - {item.preco}€
+        </Text>
+
+        <Text style={styles.nome} numberOfLines={1}>
+          {item.estado.nome}
+        </Text>
       </View>
       <View style={styles.iconContainer}>
         <Image style={styles.icon} source={icon} />

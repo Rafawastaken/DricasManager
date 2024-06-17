@@ -122,6 +122,31 @@ const fetchAll = (tableName, callback) => {
     });
   }
 
+  if (tableName === "encomendas") {
+    return onSnapshot(collection(db, tableName), (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        reference: doc.data().reference,
+        nome: doc.data().nome,
+        preco: doc.data().valorEncomenda,
+        artigo: doc.data().artigos,
+        tracking: doc.data().tracking,
+        orderDate: doc.data().orderDate,
+        estado: doc.data().estado,
+      }));
+
+      // Sort data by orderDate
+      const sortedData = data.sort((a, b) => {
+        const dateA = new Date(a.orderDate.split("-").reverse().join("-"));
+        const dateB = new Date(b.orderDate.split("-").reverse().join("-"));
+        return dateB - dateA; // Sort in descending order
+      });
+
+      // Pass sorted data to the callback function
+      callback(sortedData);
+    });
+  }
+
   return onSnapshot(collection(db, tableName), (snapshot) => {
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,
