@@ -4,10 +4,9 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": [
-      "expo-router"
-    ],
-    "name": "DricasManager2",
+    "icon": "logo.png",
+    "plugins": ["expo-router"],
+    "name": "DricasManager",
     "slug": "DricasManager2",
     "extra": {
       "router": {

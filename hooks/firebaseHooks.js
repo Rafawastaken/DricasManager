@@ -7,6 +7,7 @@ import {
   getDoc,
   onSnapshot,
   deleteDoc,
+  updateDoc,
 } from "@firebase/firestore";
 
 import {
@@ -66,9 +67,15 @@ const fetchById = async (tableName, id) => {
   try {
     const docSnapshot = await getDoc(docRef);
     if (docSnapshot.exists) {
-      const imageUrl = await getImageUrl(docSnapshot.data().nomeImagemEncoded); // Call getImageUrl here
       const data = docSnapshot.data();
-      data.imageUrl = imageUrl; // Assuming you want to attach imageUrl to the returned data
+
+      if (tableName !== "encomendas") {
+        const imageUrl = await getImageUrl(
+          docSnapshot.data().nomeImagemEncoded
+        ); // Call getImageUrl here
+        data.imageUrl = imageUrl; // Assuming you want to attach imageUrl to the returned data
+      }
+
       return data;
     } else {
       return false;
@@ -189,6 +196,16 @@ const deleteItem = async (tableName, id, imageId) => {
   }
 };
 
+// Update function
+const updateDocument = async (table, id, data) => {
+  try {
+    const docRef = doc(db, table, id); // Reference to the document
+    await updateDoc(docRef, data); // Update the document
+  } catch (error) {
+    throw new Error("Failed to update document: " + error.message);
+  }
+};
+
 export {
   uploadDatabase,
   uploadMedia,
@@ -196,4 +213,5 @@ export {
   getImageUrl,
   fetchAll,
   deleteItem,
+  updateDocument,
 };

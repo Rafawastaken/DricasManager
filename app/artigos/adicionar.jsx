@@ -88,6 +88,7 @@ const AdicionarArtigo = () => {
 
       // Upload data to Firebase
       const uploadResult = await uploadDatabase("artigos", data);
+
       if (uploadResult !== true) {
         throw new Error("Erro ao carregar dados");
       }
